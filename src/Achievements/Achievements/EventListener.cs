@@ -43,7 +43,7 @@ namespace Achievements
         {
             var userAchievement = JsonConvert.DeserializeObject<UserAchievement<string>>(Encoding.UTF8.GetString(message.Body));
 
-            await _repository.Add(userAchievement);
+            await _repository.Add(userAchievement.UserId, userAchievement.Achievement.Id);
 
             // Complete the message so that it is not received again.
             // This can be done only if the queue Client is created in ReceiveMode.PeekLock mode (which is the default).

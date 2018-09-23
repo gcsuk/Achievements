@@ -39,7 +39,7 @@ namespace Achievements.Controllers
 
         // GET api/achievements/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Achievement>> Get(int id)
+        public async Task<ActionResult<GetAchievementsResponse>> Get(int id)
         {
             var achievement = await _repository.GetByID(id);
 

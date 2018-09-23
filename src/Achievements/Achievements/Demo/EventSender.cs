@@ -18,8 +18,10 @@ namespace Achievements.Demo
                 var achievement = new UserAchievement<string>
                 {
                     UserId = "1",
-                    AchievementId = 1,
-                    DateUnlocked = DateTime.Now
+                    Achievement = new Achievement
+                    {
+                        Id = 1
+                    }
                 };
 
                 // Create a new message to send to the queue (serialise the payload)

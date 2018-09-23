@@ -28,6 +28,8 @@ namespace Achievements
 
             services.AddTransient<IRepository<Achievement, int>, AchievementsRepository>(
                 serviceProvider => new AchievementsRepository(connectionString));
+            services.AddTransient<IUserAchievementsRepository<string>, UserAchievementsRepository>(
+                serviceProvider => new UserAchievementsRepository(connectionString));
 
             services.AddCors();
 
