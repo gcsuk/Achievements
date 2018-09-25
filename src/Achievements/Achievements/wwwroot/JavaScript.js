@@ -5,8 +5,8 @@ const setupConnection = () => {
         .withUrl(`/achievementshub?userId=1`)
         .build();
 
-    connection.on('Unlocked', (message) => {
-        console.log(`achievement unlocked: ${message}`);
+    connection.on('Unlocked', (achievement) => {
+        console.log(`${achievement}`);
     });
 };
 

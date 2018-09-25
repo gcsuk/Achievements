@@ -16,15 +16,18 @@ namespace Achievements.Events
     public class EventListener : IHostedService
     {
         private static IQueueClient _queueClient;
-        private static IUserAchievementsRepository<string> _repository;
+        private static IUserAchievementsRepository<string> _userAchievementsRepository;
+        private readonly IRepository<Achievement, int> _achievementsRepository;
         private IConfiguration _configuration;
         private IHubContext<AchievementsHub> _hubContext;
 
-        public EventListener(IConfiguration configuration, IHubContext<AchievementsHub> hubContext, IUserAchievementsRepository<string> repository)
+        public EventListener(IConfiguration configuration, IHubContext<AchievementsHub> hubContext,
+            IUserAchievementsRepository<string> userAchievementsRepository, IRepository<Achievement, int> achievementsRepository)
         {
             _configuration = configuration;
             _hubContext = hubContext;
-            _repository = repository;
+            _userAchievementsRepository = userAchievementsRepository;
+            _achievementsRepository = achievementsRepository;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -64,7 +67,7 @@ namespace Achievements.Events
         {
             var userAchievement = JsonConvert.DeserializeObject<AchievementUnlockedEvent>(Encoding.UTF8.GetString(message.Body));
 
-            await _repository.Add(userAchievement.UserId, userAchievement.Achievement.Id);
+            await _userAchievementsRepository.Add(userAchievement.UserId, userAchievement.AchievementId);
 
             // Complete the message so that it is not received again.
             // This can be done only if the queue Client is created in ReceiveMode.PeekLock mode (which is the default).
@@ -72,7 +75,11 @@ namespace Achievements.Events
             // Note: Use the cancellationToken passed as necessary to determine if the _queueClient has already been closed.
             // If _queueClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
             // to avoid unnecessary exceptions.
-            await _hubContext.Clients.User(userAchievement.UserId).SendAsync("Unlocked", "hello");
+
+            var achievement = await _achievementsRepository.GetByID(userAchievement.AchievementId);
+
+            foreach (var connectionId in AchievementsHub.Connections.GetConnections(userAchievement.UserId))
+                await _hubContext.Clients.Client(connectionId).SendAsync("Unlocked", JsonConvert.SerializeObject(achievement));
         }
 
         // Use this handler to examine the exceptions received on the message pump.

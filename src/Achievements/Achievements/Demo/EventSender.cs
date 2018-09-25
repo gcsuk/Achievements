@@ -1,5 +1,4 @@
 ﻿using Achievements.Events;
-using Achievements.Models;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using System;
@@ -19,10 +18,7 @@ namespace Achievements.Demo
                 var achievement = new AchievementUnlockedEvent
                 {
                     UserId = "1",
-                    Achievement = new Achievement
-                    {
-                        Id = 1
-                    }
+                    AchievementId = 1
                 };
 
                 // Create a new message to send to the queue (serialise the payload)
