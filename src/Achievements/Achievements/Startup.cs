@@ -4,6 +4,7 @@ using Achievements.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.PlatformAbstractions;
@@ -24,6 +25,8 @@ namespace Achievements
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSignalR().AddMessagePackProtocol();
+
             var connectionString = Configuration.GetConnectionString("Database");
 
             services.AddTransient<IRepository<Achievement, int>, AchievementsRepository>(
@@ -34,8 +37,6 @@ namespace Achievements
             services.AddCors();
 
             services.AddRouting(options => options.LowercaseUrls = true);
-
-            services.AddSignalR().AddMessagePackProtocol();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
@@ -77,7 +78,9 @@ namespace Achievements
                 app.UseDeveloperExceptionPage();
             }
 
-            app.UseSignalR(routes => routes.MapHub<AchievementsHub>("/achievements"));
+            app.UseSignalR(routes => routes.MapHub<AchievementsHub>("/achievementshub"));
+
+            app.UseStaticFiles();
 
             app.UseMvc();
 

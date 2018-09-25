@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore;
+﻿using Achievements.Events;
+using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using System.IO;

@@ -1,4 +1,5 @@
-﻿using Achievements.Models;
+﻿using Achievements.Events;
+using Achievements.Models;
 using Microsoft.Azure.ServiceBus;
 using Newtonsoft.Json;
 using System;
@@ -15,7 +16,7 @@ namespace Achievements.Demo
 
             try
             {
-                var achievement = new UserAchievement<string>
+                var achievement = new AchievementUnlockedEvent
                 {
                     UserId = "1",
                     Achievement = new Achievement

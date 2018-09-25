@@ -28,7 +28,7 @@ namespace Achievements.Controllers
             var response = achievements.Select(a => new GetAchievementsResponse
             {
                 Id = a.Id,
-                CategoryId = a.CategoryId,
+                Category = a.Category.Name,
                 Name = a.Name,
                 Details = a.Details,
                 IsSecret = a.IsSecret
@@ -46,7 +46,7 @@ namespace Achievements.Controllers
             var response = new GetAchievementsResponse
             {
                 Id = achievement.Id,
-                CategoryId = achievement.CategoryId,
+                Category = achievement.Category.Name,
                 Name = achievement.Name,
                 Details = achievement.Details,
                 IsSecret = achievement.IsSecret
@@ -61,7 +61,7 @@ namespace Achievements.Controllers
         {
             var achievement = new Achievement
             {
-                CategoryId = request.CategoryId,
+                Category = new Category { Id = request.CategoryId },
                 Name = request.Name,
                 Details = request.Details,
                 IsSecret = request.IsSecret
@@ -79,7 +79,7 @@ namespace Achievements.Controllers
             var achievement = new Achievement
             {
                 Id = id,
-                CategoryId = request.CategoryId,
+                Category = new Category { Id = request.CategoryId },
                 Name = request.Name,
                 Details = request.Details,
                 IsSecret = request.IsSecret

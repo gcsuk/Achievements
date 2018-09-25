@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace Achievements
+namespace Achievements.Events
 {
     public class EventListener
     {
@@ -41,7 +41,7 @@ namespace Achievements
 
         private async static Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
-            var userAchievement = JsonConvert.DeserializeObject<UserAchievement<string>>(Encoding.UTF8.GetString(message.Body));
+            var userAchievement = JsonConvert.DeserializeObject<AchievementUnlockedEvent>(Encoding.UTF8.GetString(message.Body));
 
             await _repository.Add(userAchievement.UserId, userAchievement.Achievement.Id);
 

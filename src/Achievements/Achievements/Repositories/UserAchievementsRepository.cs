@@ -54,8 +54,6 @@ namespace Achievements.Repositories
 
                 dbConnection.Open();
 
-                var achievementDictionary = new Dictionary<int, UserAchievement<string>>();
-
                 var userAchievements = await dbConnection.QueryAsync<UserAchievement<string>, Achievement, UserAchievement<string>>(
                     sql,
                     (userAchievement, achievement) =>
@@ -77,28 +75,74 @@ namespace Achievements.Repositories
             {
                 const string sql =
                     "SELECT UserAchievements.UserId, UserAchievements.DateUnlocked, UserAchievements.IsNew, " +
-                    "       Achievements.Id AS AchievementId, Achievements.* " +
+                    "       Achievements.Id AS AchievementId, Achievements.*, " +
+                    "       Categories.Id AS CategoryId, Categories.* " +
                     "FROM   UserAchievements  " +
                     "INNER JOIN Achievements ON Achievements.Id = UserAchievements.AchievementId " +
+                    "INNER JOIN Categories ON Categories.Id = Achievements.CategoryId " +
                     "WHERE  UserAchievements.UserId = @userId";
 
                 dbConnection.Open();
 
-                var achievementDictionary = new Dictionary<int, UserAchievement<string>>();
-
-                var userAchievements = await dbConnection.QueryAsync<UserAchievement<string>, Achievement, UserAchievement<string>>(
+                var userAchievements = await dbConnection.QueryAsync<UserAchievement<string>, Achievement, Category, UserAchievement<string>>(
                     sql,
-                    (userAchievement, achievement) =>
+                    (userAchievement, achievement, category) =>
                     {
                         userAchievement.Achievement = achievement;
+                        userAchievement.Achievement.Category = category;
 
                         return userAchievement;
                     },
-                    splitOn: "AchievementId",
+                    splitOn: "AchievementId, CategoryId",
                     param: new { userId }
                 );
 
                 return userAchievements;
+            }
+        }
+
+        public async Task<IEnumerable<UserAchievement<string>>> GetNewForUserId(string userId)
+        {
+            using (var dbConnection = new SqlConnection(_connectionString))
+            {
+                const string sql =
+                    "SELECT UserAchievements.UserId, UserAchievements.DateUnlocked, UserAchievements.IsNew, " +
+                    "       Achievements.Id AS AchievementId, Achievements.*, " +
+                    "       Categories.Id AS CategoryId, Categories.* " +
+                    "FROM   UserAchievements  " +
+                    "INNER JOIN Achievements ON Achievements.Id = UserAchievements.AchievementId " +
+                    "INNER JOIN Categories ON Categories.Id = Achievements.CategoryId " +
+                    "WHERE  UserAchievements.UserId = @userId" +
+                    "       AND IsNew = 1";
+
+                dbConnection.Open();
+
+                var userAchievements = await dbConnection.QueryAsync<UserAchievement<string>, Achievement, Category, UserAchievement<string>>(
+                    sql,
+                    (userAchievement, achievement, category) =>
+                    {
+                        userAchievement.Achievement = achievement;
+                        userAchievement.Achievement.Category = category;
+
+                        return userAchievement;
+                    },
+                    splitOn: "AchievementId, CategoryId",
+                    param: new { userId }
+                );
+
+                return userAchievements;
+            }
+        }
+
+        public async Task SetNotNew(string userId, int achievementId)
+        {
+            using (var dbConnection = new SqlConnection(_connectionString))
+            {
+                const string query = "UPDATE UserAchievements SET IsNew = 0 WHERE UserId = @userId AND AchievementId = @achievementId";
+
+                dbConnection.Open();
+
+                await dbConnection.ExecuteAsync(query, new { userId, achievementId });
             }
         }
     }

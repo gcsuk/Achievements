@@ -7,7 +7,9 @@ namespace Achievements.Repositories
     public interface IUserAchievementsRepository<T>
     {
         Task<IEnumerable<UserAchievement<T>>> GetForUserId(T userId);
+        Task<IEnumerable<UserAchievement<T>>> GetNewForUserId(T userId);
         Task<T> Add(T userId, int achievementId);
         Task Delete(T userId, int achievementId);
+        Task SetNotNew(T userId, int achievementId);
     }
 }
