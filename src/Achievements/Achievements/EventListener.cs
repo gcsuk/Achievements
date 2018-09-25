@@ -1,6 +1,10 @@
-﻿using Achievements.Models;
+﻿using Achievements.Hubs;
+using Achievements.Models;
 using Achievements.Repositories;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.ServiceBus;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
 using System.Text;
@@ -9,20 +13,38 @@ using System.Threading.Tasks;
 
 namespace Achievements
 {
-    public class EventListener
+    public class EventListener : IHostedService
     {
-        private static IQueueClient _queueClient;
-        private static UserAchievementsRepository _repository;
+        private IQueueClient _queueClient;
+        private UserAchievementsRepository _repository;
+        private IConfiguration _configuration;
+        private IHubContext<AchievementsHub> _hubContext;
 
-        public static void InitialiseQueue(string serviceBusConnectionString, string databaseConnectionString)
+        public EventListener(IConfiguration configuration, IHubContext<AchievementsHub> hubContext)
         {
+            _configuration = configuration;
+            _hubContext = hubContext;
+        }
+
+        public Task StartAsync(CancellationToken cancellationToken)
+        {
+            var serviceBusConnectionString = _configuration.GetConnectionString("ServiceBus");
+            var databaseConnectionString = _configuration.GetConnectionString("Database");
+
             _repository = new UserAchievementsRepository(databaseConnectionString);
             _queueClient = new QueueClient(serviceBusConnectionString, "unlockedachievements");
 
             RegisterOnMessageHandlerAndReceiveMessages();
+
+            return Task.CompletedTask;
         }
 
-        private static void RegisterOnMessageHandlerAndReceiveMessages()
+        public Task StopAsync(CancellationToken cancellationToken)
+        {
+            return _queueClient.CloseAsync();
+        }
+
+        private void RegisterOnMessageHandlerAndReceiveMessages()
         {
             // Configure the message handler options in terms of exception handling, number of concurrent messages to deliver, etc.
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
@@ -39,7 +61,7 @@ namespace Achievements
             _queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
         }
 
-        private async static Task ProcessMessagesAsync(Message message, CancellationToken token)
+        private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             var userAchievement = JsonConvert.DeserializeObject<UserAchievement<string>>(Encoding.UTF8.GetString(message.Body));
 
@@ -51,10 +73,11 @@ namespace Achievements
             // Note: Use the cancellationToken passed as necessary to determine if the _queueClient has already been closed.
             // If _queueClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
             // to avoid unnecessary exceptions.
+            await _hubContext.Clients.User(userAchievement.UserId).SendAsync("OnAchievement", userAchievement);
         }
 
         // Use this handler to examine the exceptions received on the message pump.
-        private static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
+        private Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
             Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
             var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
