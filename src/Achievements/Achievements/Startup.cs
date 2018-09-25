@@ -1,4 +1,5 @@
-﻿using Achievements.Hubs;
+﻿using Achievements.Events;
+using Achievements.Hubs;
 using Achievements.Models;
 using Achievements.Repositories;
 using Microsoft.AspNetCore.Builder;
@@ -35,6 +36,8 @@ namespace Achievements
                 serviceProvider => new UserAchievementsRepository(connectionString));
 
             services.AddCors();
+
+            services.AddHostedService<EventListener>();
 
             services.AddRouting(options => options.LowercaseUrls = true);
 
