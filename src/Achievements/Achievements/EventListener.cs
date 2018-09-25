@@ -1,5 +1,7 @@
-﻿using Achievements.Models;
+﻿using Achievements.Hubs;
+using Achievements.Models;
 using Achievements.Repositories;
+using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
@@ -16,10 +18,12 @@ namespace Achievements
         private IQueueClient _queueClient;
         private UserAchievementsRepository _repository;
         private IConfiguration _configuration;
+        private IHubContext<AchievementsHub> _hubContext;
 
-        public EventListener(IConfiguration configuration)
+        public EventListener(IConfiguration configuration, IHubContext<AchievementsHub> hubContext)
         {
             _configuration = configuration;
+            _hubContext = hubContext;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -69,6 +73,7 @@ namespace Achievements
             // Note: Use the cancellationToken passed as necessary to determine if the _queueClient has already been closed.
             // If _queueClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
             // to avoid unnecessary exceptions.
+            await _hubContext.Clients.All.SendAsync("OnAchievement", userAchievement);
         }
 
         // Use this handler to examine the exceptions received on the message pump.
