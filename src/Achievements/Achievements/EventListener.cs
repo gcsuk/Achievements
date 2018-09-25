@@ -73,7 +73,7 @@ namespace Achievements
             // Note: Use the cancellationToken passed as necessary to determine if the _queueClient has already been closed.
             // If _queueClient has already been closed, you can choose to not call CompleteAsync() or AbandonAsync() etc.
             // to avoid unnecessary exceptions.
-            await _hubContext.Clients.All.SendAsync("OnAchievement", userAchievement);
+            await _hubContext.Clients.User(userAchievement.UserId).SendAsync("OnAchievement", userAchievement);
         }
 
         // Use this handler to examine the exceptions received on the message pump.
