@@ -33,6 +33,8 @@ namespace Achievements
 
             services.AddCors();
 
+            services.AddHostedService<EventListener>();
+
             services.AddRouting(options => options.LowercaseUrls = true);
 
             services.AddSignalR().AddMessagePackProtocol();
