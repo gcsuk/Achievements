@@ -40,7 +40,6 @@ namespace Achievements
             return _queueClient.CloseAsync();
         }
 
-
         private void RegisterOnMessageHandlerAndReceiveMessages()
         {
             // Configure the message handler options in terms of exception handling, number of concurrent messages to deliver, etc.
