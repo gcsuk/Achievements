@@ -8,6 +8,8 @@ There is also a management API for CRUD operations against Achievements and User
 
 **This is a small learning project for using Service Bus and SignalR together in .NET Core. It works, but it isn't optimised for production use. I will make changes over time but it is not "supported." Having said that, and PRs opened against it will be reviewed and merged if they add value.**
 
+*Credit to [David Fowl](https://stackoverflow.com/users/45091/davidfowl) for help when I was completely stuck getting the Service Bus handler to talk to SignalR* [(Stack Overflow)](https://stackoverflow.com/questions/52470647/how-to-access-signalr-connection-from-azure-service-bus-event-handler)
+
 ## Pre-requisites
 
 - Visual Studio 2017 Update 5+
