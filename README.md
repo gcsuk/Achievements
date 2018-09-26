@@ -37,6 +37,9 @@ There is also a management API for CRUD operations against Achievements and User
   - Open the console (F12) you should see that SignalR is connected
 - Open a new tab, navigate to /swagger/ui
   - Create an achievement using the POST endpoint in Achievements section.
+  - Open the Demo section and executre POST /demo/events/send
+  - Return to the other tab and in the console you should see an Achievement Unlocked message in the console.
+  - Use the GET endpoint of the User Achievements section of Swager to verify the achievement is in the database
 
 ## Notes and future improvements
 
