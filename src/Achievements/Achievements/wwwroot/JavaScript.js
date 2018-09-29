@@ -11,13 +11,15 @@ const setupConnection = () => {
 };
 
 const start = async () => {
-    await connection.start().catch(err => console.error(err.toString()));
+    await connection.start();
+    
     document.getElementById('start').disabled = true;
     document.getElementById('stop').disabled = false;
 };
 
 const stop = async () => {
-    await connection.stop().catch(err => console.error(err.toString()));
+    await connection.stop();
+
     document.getElementById('start').disabled = false;
     document.getElementById('stop').disabled = true;
 };

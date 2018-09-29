@@ -78,8 +78,7 @@ namespace Achievements.Events
 
             var achievement = await _achievementsRepository.GetByID(userAchievement.AchievementId);
 
-            foreach (var connectionId in AchievementsHub.Connections.GetConnections(userAchievement.UserId))
-                await _hubContext.Clients.Client(connectionId).SendAsync("Unlocked", JsonConvert.SerializeObject(achievement));
+            await _hubContext.Clients.User(userAchievement.UserId).SendAsync("Unlocked", achievement);
         }
 
         // Use this handler to examine the exceptions received on the message pump.

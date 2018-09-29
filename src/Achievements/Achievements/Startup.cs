@@ -1,4 +1,5 @@
-﻿using Achievements.Events;
+﻿using Achievements.Demo;
+using Achievements.Events;
 using Achievements.Hubs;
 using Achievements.Models;
 using Achievements.Repositories;
@@ -37,7 +38,11 @@ namespace Achievements
 
             services.AddCors();
 
+            services.AddSingleton<EventSender>();
+
             services.AddHostedService<EventListener>();
+
+            services.AddSingleton<IUserIdProvider, QueryStringUserIdProvider>();
 
             services.AddRouting(options => options.LowercaseUrls = true);
 

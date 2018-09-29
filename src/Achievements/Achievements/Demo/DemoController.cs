@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using Achievements.Events;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 
@@ -6,11 +7,11 @@ namespace Achievements.Demo
 {
     public class DemoController : Controller
     {
-        private readonly IConfiguration _configuration;
+        private readonly EventSender _eventSender;
 
-        public DemoController(IConfiguration configuration)
+        public DemoController(EventSender eventSender)
         {
-            _configuration = configuration;
+            _eventSender = eventSender;
         }
 
         /// <summary>
@@ -19,7 +20,13 @@ namespace Achievements.Demo
         [HttpPost("/demo/events/send")]
         public async Task<IActionResult> SendEvent()
         {
-            await EventSender.Send(_configuration.GetConnectionString("ServiceBus"));
+            var achievement = new AchievementUnlockedEvent
+            {
+                UserId = "1",
+                AchievementId = 1
+            };
+            
+            await _eventSender.Send(achievement);
 
             return NoContent();
         }
