@@ -43,6 +43,9 @@ namespace Achievements.Controllers
         {
             var achievement = await _repository.GetByID(id);
 
+            if (achievement == null)
+                return NotFound();
+
             var response = new GetAchievementsResponse
             {
                 Id = achievement.Id,
