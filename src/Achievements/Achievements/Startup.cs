@@ -6,6 +6,7 @@ using Achievements.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.Azure.ServiceBus;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
@@ -26,20 +27,20 @@ namespace Achievements
         {
             services.AddSignalR().AddMessagePackProtocol();
 
+            services.AddCors();
+
             var connectionString = Configuration.GetConnectionString("Database");
 
+            services.AddSingleton<IUserIdProvider, QueryStringUserIdProvider>();
+            services.AddSingleton<ITopicClient, TopicClient>(
+                serviceProvider => new TopicClient(Configuration.GetConnectionString("ServiceBus"), "platformactivity"));
+            services.AddSingleton<IEventSender, EventSender>();
             services.AddSingleton<IRepository<Achievement, int>, AchievementsRepository>(
                 serviceProvider => new AchievementsRepository(connectionString));
             services.AddSingleton<IUserAchievementsRepository<string>, UserAchievementsRepository>(
                 serviceProvider => new UserAchievementsRepository(connectionString));
 
-            services.AddCors();
-
-            services.AddSingleton<EventSender>();
-
             services.AddHostedService<EventListener>();
-
-            services.AddSingleton<IUserIdProvider, QueryStringUserIdProvider>();
 
             services.AddControllers();
 

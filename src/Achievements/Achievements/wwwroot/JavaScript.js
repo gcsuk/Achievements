@@ -6,7 +6,7 @@ const setupConnection = () => {
         .build();
 
     connection.on('Unlocked', (achievement) => {
-        console.log(`${achievement}`);
+        document.getElementById("achievementDetails").innerHTML = JSON.stringify(achievement);
     });
 };
 

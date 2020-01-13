@@ -7,9 +7,9 @@ namespace Achievements.Demo
 {
     public class DemoController : Controller
     {
-        private readonly EventSender _eventSender;
+        private readonly IEventSender _eventSender;
 
-        public DemoController(EventSender eventSender)
+        public DemoController(IEventSender eventSender)
         {
             _eventSender = eventSender;
         }

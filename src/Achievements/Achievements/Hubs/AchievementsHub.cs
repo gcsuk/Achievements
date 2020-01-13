@@ -1,11 +1,4 @@
-﻿using Achievements.Repositories;
-using Achievements.Responses;
-using Microsoft.AspNetCore.SignalR;
-using Newtonsoft.Json;
-using System;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Web;
+﻿using Microsoft.AspNetCore.SignalR;
 
 namespace Achievements.Hubs
 {

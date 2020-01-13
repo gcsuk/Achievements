@@ -36,14 +36,14 @@ There is also a management API for CRUD operations against Achievements and User
 - Run the application.
 - Navigate to index.html
   - You should see a `Start` button. Click that.
-  - Open the console (F12) you should see that SignalR is connected
-- Open a new tab, navigate to /swagger/ui
+  - Open the console (F12) you should see that SignalR is connected.
+- Open a new tab, navigate to /swagger
   - Create an achievement using the POST endpoint in Achievements section.
-  - Open the Demo section and executre POST /demo/events/send
-  - Return to the other tab and in the console you should see an Achievement Unlocked message in the console.
-  - Use the GET endpoint of the User Achievements section of Swager to verify the achievement is in the database
+  - Open the Demo section and execute POST /demo/events/send.
+  - Return to the other tab and in the console you should see the achievement details printed to the screen.
+  - Use the GET endpoint of the User Achievements section of Swagger to verify the achievement is in the database.
 
 ## Notes and future improvements
 
-- UserId is currently hard coded to `1` in demo sender
-- Use the UserAchievements CRUD endpoints to remove Achievement ID 1 for User ID 1 in between calling the demo event sender, as otherwise it will attempt to insert a duplicate database entry and fall over
+- UserId is currently hard coded to `1` in demo sender.
+- Use the UserAchievements CRUD endpoints to remove Achievement ID 1 for User ID 1 in between calling the demo event sender, as otherwise it will attempt to insert a duplicate database entry and fall over.
