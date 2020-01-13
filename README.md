@@ -12,8 +12,8 @@ There is also a management API for CRUD operations against Achievements and User
 
 ## Pre-requisites
 
-- Visual Studio 2017 Update 5+
-- .NET Core 2.1.4 Runtime
+- Visual Studio 2019 (16.4)
+- .NET Core 3.1 Runtime (when deploying)
 - Knowledge of .NET Core configuration
 
 ## Setup
@@ -21,7 +21,7 @@ There is also a management API for CRUD operations against Achievements and User
 - Clone the repository
 - Create a service bus namespace in Azure
   - Note the Primary Connection String in `Shared access policies` > `RootManageSharedAccessKey`
-  - Create a queue called `unlockedachievements`
+  - Create a topic called `unlockedachievements`
 - Create a database in Azure
     - Note the Connection String in `Connection Strings`
     - Create a database user and note the username and password
