@@ -26,7 +26,8 @@ There is also a management API for CRUD operations against Achievements and User
     - Note the Connection String in `Connection Strings`
     - Create a database user and note the username and password
 - Run SQL scripts in `DatabaseCreationScripts.sql` in the repo root to create the database tables
-- In appsettings.json set the Database and Service Bus connection strings - *do not commit these to your forked repo*
+- In a user secrets file, set the Database and Service Bus connection strings - *do not fill in the entries in app.settings and commit these to your forked repo, they are there to be overridden by Azure Configuration transformations not development. Look here https://docs.microsoft.com/en-us/aspnet/core/security/app-secrets for more info*
+- In a CLI navigate to the wwwroot directory and run `npm install`
 - Create a Web App in Azure
     - Add both connection string entries to the ConnectionStrings section of Application Settings
     - Set `Web Sockets` to `On` in Application Settings
