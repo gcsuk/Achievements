@@ -1,13 +1,21 @@
 ﻿<html>
 <head>
     <title>Demo SignalR Client</title>
+    <link rel="stylesheet" href="StyleSheet.css" />
 </head>
 <body>
+<div>
     <div>
-        <button id="start">Start</button>
-        <button id="stop" disabled="disabled">Stop</button>
-        <div id="achievementDetails"></div>
+        <button id="start" class="start">Start</button>
+        <button id="stop" class="stop" disabled="disabled">Stop</button>
     </div>
+    <div>
+
+    </div>
+    <div id="achievement" class="achievement hide">
+        <span class="description">Description</span>
+    </div>
+</div>
     <script src="site.js"></script>
 </body>
 </html>

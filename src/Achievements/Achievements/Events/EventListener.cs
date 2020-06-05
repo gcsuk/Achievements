@@ -7,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
 using System;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -62,11 +63,16 @@ namespace Achievements.Events
         {
             var userAchievement = JsonConvert.DeserializeObject<AchievementUnlockedEvent>(Encoding.UTF8.GetString(message.Body));
 
-            await _userAchievementsRepository.Add(userAchievement.UserId, userAchievement.AchievementId);
+            var existingAchievements = await _userAchievementsRepository.GetForUserId(userAchievement.UserId);
 
-            var achievement = await _achievementsRepository.GetByID(userAchievement.AchievementId);
+            if (existingAchievements.All(a => a.Achievement.Id != userAchievement.AchievementId))
+            {
+                await _userAchievementsRepository.Add(userAchievement.UserId, userAchievement.AchievementId);
 
-            await _hubContext.Clients.User(userAchievement.UserId).SendAsync("Unlocked", achievement, token);
+                var achievement = await _achievementsRepository.GetByID(userAchievement.AchievementId);
+
+                await _hubContext.Clients.User(userAchievement.UserId).SendAsync("Unlocked", achievement, token);
+            }
         }
 
         // Use this handler to examine the exceptions received on the message pump.

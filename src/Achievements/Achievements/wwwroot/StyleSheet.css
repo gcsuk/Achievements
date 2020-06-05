@@ -1,0 +1,38 @@
+﻿button {
+    padding: 50px 100px;
+    border: solid 1px #000;
+    border-radius: 20px;
+    font-size: 2rem;
+    color: #fff;
+    cursor: hand;
+}
+
+button.start {
+    background-color: green;
+}
+
+button.stop {
+    background-color: #f00;
+}
+
+button:disabled {
+    background-color: grey
+}
+
+.achievement {
+    background-image: url('./Achievement.png');
+    width: 775px;
+    height: 149px;
+}
+
+.achievement .description {
+    display: block;
+    padding: 85px 0 0 195px;
+    font-size: 2rem;
+    font-family: Arial;
+    color: gainsboro;
+}
+
+.hide {
+    display: none;
+}

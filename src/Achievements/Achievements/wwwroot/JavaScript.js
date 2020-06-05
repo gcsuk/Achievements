@@ -6,7 +6,12 @@ const setupConnection = () => {
         .build();
 
     connection.on('Unlocked', (achievement) => {
-        document.getElementById("achievementDetails").innerHTML = JSON.stringify(achievement);
+        document.querySelector(".description").innerHTML = achievement.name;
+        document.querySelector(".achievement").classList.remove("hide");
+
+        setTimeout(function() {
+            document.querySelector(".achievement").classList.add("hide");
+        }, 3000);
     });
 };
 

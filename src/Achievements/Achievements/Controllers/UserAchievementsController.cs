@@ -42,7 +42,10 @@ namespace Achievements.Controllers
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] AddUserAchievementRequest request)
         {
-            await _repository.Add(request.UserId, request.AchievementId);
+            var existingAchievements = await _repository.GetForUserId(request.UserId);
+
+            if (existingAchievements.All(a => a.Achievement.Id != request.AchievementId))
+                await _repository.Add(request.UserId, request.AchievementId);
 
             return NoContent();
         }
