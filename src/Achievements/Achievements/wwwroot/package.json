@@ -18,18 +18,18 @@
     "babel-polyfill": "^6.26.0",
     "babel-preset-es2015": "^6.24.1",
     "eslint": "^4.17.0",
-    "eslint-plugin-import": "^2.20.2",
-    "eslint-plugin-react": "^7.20.0",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-react": "^7.21.5",
     "eslint-watch": "^7.0.0",
     "node-sass": "^4.14.1",
     "npm-run-all": "^4.1.5",
     "onchange": "^6.1.1",
-    "open": "^7.0.4",
-    "uglify-js": "^3.9.4",
+    "open": "^7.3.0",
+    "uglify-js": "^3.11.5",
     "watchify": "^3.11.1"
   },
   "dependencies": {
     "@aspnet/signalr": "^1.1.4",
-    "tslib": "^1.13.0"
+    "tslib": "^1.14.1"
   }
 }
