@@ -37,9 +37,9 @@ namespace Achievements.Events
             return Task.CompletedTask;
         }
 
-        public Task StopAsync(CancellationToken cancellationToken)
+        public async Task StopAsync(CancellationToken cancellationToken)
         {
-            return _subscriptionClient.CloseAsync();
+            await _subscriptionClient.CloseAsync();
         }
 
         private void RegisterOnMessageHandlerAndReceiveMessages()
