@@ -9,24 +9,24 @@ namespace Achievements.Demo
 {
     public class EventSender : IEventSender
     {
-        private readonly ITopicClient _topicClient;
+        private readonly IQueueClient _queueClient;
 
-        public EventSender(ITopicClient topicClient)
+        public EventSender(IQueueClient queueClient)
         {
-            _topicClient = topicClient;
+            _queueClient = queueClient;
         }
 
         public async Task Send(IAchievementEvent achievement)
         {
             try
             {
-                // Create a new message to send to the topic (serialise the payload)
+                // Create a new message to send to the queue (serialise the payload)
                 var message = new Message(Encoding.UTF8.GetBytes(JsonSerializer.Serialize(achievement)));
 
                 message.UserProperties.Add("userId", achievement.UserId);
 
                 // Send the message to the topic
-                await _topicClient.SendAsync(message);
+                await _queueClient.SendAsync(message);
             }
             catch (Exception exception)
             {
@@ -38,7 +38,7 @@ namespace Achievements.Demo
         // or the IQueueClient should be shared between sending and listener
         public async Task CloseAsync()
         {
-            await _topicClient.CloseAsync();
+            await _queueClient.CloseAsync();
         }
     }
 }

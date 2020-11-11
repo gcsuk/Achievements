@@ -1,7 +1,7 @@
 ﻿using Achievements.Demo;
 using Achievements.Events;
 using Achievements.Hubs;
-using Achievements.Models;
+using Achievements.Models.Entities;
 using Achievements.Repositories;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -25,23 +25,18 @@ namespace Achievements
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddSignalR().AddMessagePackProtocol();
-
             services.AddCors();
 
-            var connectionString = Configuration.GetConnectionString("Database");
-
             services.AddSingleton<IUserIdProvider, QueryStringUserIdProvider>();
-            services.AddSingleton<ITopicClient, TopicClient>(
-                serviceProvider => new TopicClient(Configuration.GetConnectionString("ServiceBus"), "platformactivity"));
+            services.AddSingleton<IQueueClient, QueueClient>(
+                serviceProvider => new QueueClient(Configuration.GetConnectionString("ServiceBus"), "unlockedachievements"));
             services.AddSingleton<IEventSender, EventSender>();
-            services.AddSingleton<IRepository<Achievement, int>, AchievementsRepository>(
-                serviceProvider => new AchievementsRepository(connectionString));
-            services.AddSingleton<IUserAchievementsRepository<string>, UserAchievementsRepository>(
-                serviceProvider => new UserAchievementsRepository(connectionString));
+            services.AddSingleton<IRepository<AchievementEntity>, AchievementsRepository>();
+            services.AddSingleton<IRepository<UnlockedAchievementEntity>, UnlockedAchievementsRepository>();
 
             services.AddHostedService<EventListener>();
 
+            services.AddSignalR();
             services.AddControllers();
 
             services.AddSwaggerGen(c =>

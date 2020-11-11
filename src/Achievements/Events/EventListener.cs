@@ -1,13 +1,11 @@
 ﻿using Achievements.Hubs;
-using Achievements.Models;
+using Achievements.Models.Entities;
 using Achievements.Repositories;
 using Microsoft.AspNetCore.SignalR;
 using Microsoft.Azure.ServiceBus;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Newtonsoft.Json;
-using System;
-using System.Linq;
+using Serilog;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
@@ -16,18 +14,18 @@ namespace Achievements.Events
 {
     public class EventListener : IHostedService
     {
-        private readonly SubscriptionClient _subscriptionClient;
-        private static IUserAchievementsRepository<string> _userAchievementsRepository;
-        private readonly IRepository<Achievement, int> _achievementsRepository;
+        private static IQueueClient _queueClient;
+        private static IRepository<UnlockedAchievementEntity> _unlockedAchievementsRepository;
+        private readonly IRepository<AchievementEntity> _achievementsRepository;
         private readonly IHubContext<AchievementsHub> _hubContext;
 
-        public EventListener(IConfiguration configuration, IHubContext<AchievementsHub> hubContext,
-            IUserAchievementsRepository<string> userAchievementsRepository, IRepository<Achievement, int> achievementsRepository)
+        public EventListener(IQueueClient queueClient, IHubContext<AchievementsHub> hubContext,
+            IRepository<UnlockedAchievementEntity> unlockedAchievementsRepository, IRepository<AchievementEntity> achievementsRepository)
         {
             _hubContext = hubContext;
-            _userAchievementsRepository = userAchievementsRepository;
+            _unlockedAchievementsRepository = unlockedAchievementsRepository;
             _achievementsRepository = achievementsRepository;
-            _subscriptionClient = new SubscriptionClient(configuration.GetConnectionString("ServiceBus"), "platformactivity", "Achievements", ReceiveMode.ReceiveAndDelete);
+            _queueClient = queueClient;
         }
 
         public Task StartAsync(CancellationToken cancellationToken)
@@ -39,10 +37,10 @@ namespace Achievements.Events
 
         public async Task StopAsync(CancellationToken cancellationToken)
         {
-            await _subscriptionClient.CloseAsync();
+            await _queueClient.CloseAsync();
         }
 
-        private void RegisterOnMessageHandlerAndReceiveMessages()
+        public void RegisterOnMessageHandlerAndReceiveMessages()
         {
             // Configure the message handler options in terms of exception handling, number of concurrent messages to deliver, etc.
             var messageHandlerOptions = new MessageHandlerOptions(ExceptionReceivedHandler)
@@ -52,38 +50,54 @@ namespace Achievements.Events
                 MaxConcurrentCalls = 1,
                 // Indicates whether the message pump should automatically complete the messages after returning from user callback.
                 // False below indicates the complete operation is handled by the user callback as in ProcessMessagesAsync().
-                AutoComplete = false
+                AutoComplete = true
             };
 
             // Register the function that processes messages.
-            _subscriptionClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
+            _queueClient.RegisterMessageHandler(ProcessMessagesAsync, messageHandlerOptions);
         }
 
         private async Task ProcessMessagesAsync(Message message, CancellationToken token)
         {
             var userAchievement = JsonConvert.DeserializeObject<AchievementUnlockedEvent>(Encoding.UTF8.GetString(message.Body));
 
-            var existingAchievements = await _userAchievementsRepository.GetForUserId(userAchievement.UserId);
+            // ********************************************************
+            // This would normally use a rules engine of some kind here
+            // ********************************************************
 
-            if (existingAchievements.All(a => a.Achievement.Id != userAchievement.AchievementId))
+            var existingUnlockedAchievement = await _unlockedAchievementsRepository.GetEntity(userAchievement.UserId, userAchievement.Achievement);
+
+            // Only update if it isn't there already, otherwise it would set IsNew = true on existing records
+            if (existingUnlockedAchievement == null)
             {
-                await _userAchievementsRepository.Add(userAchievement.UserId, userAchievement.AchievementId);
+                var newAchievement = new UnlockedAchievementEntity
+                {
+                    PartitionKey = userAchievement.UserId,
+                    RowKey = userAchievement.Achievement,
+                    IsNew = true
+                };
 
-                var achievement = await _achievementsRepository.GetByID(userAchievement.AchievementId);
+                await _unlockedAchievementsRepository.InsertOrMergeEntity(newAchievement);
 
-                await _hubContext.Clients.User(userAchievement.UserId).SendAsync("Unlocked", achievement, token);
+                var achievementDetails = await _achievementsRepository.GetEntity("1", newAchievement.RowKey);
+
+                var response = new
+                {
+                    Name = achievementDetails.RowKey,
+                    achievementDetails.Description
+                };
+
+                await _hubContext.Clients.User(userAchievement.UserId).SendAsync("Unlocked", response, token);
             }
         }
 
         // Use this handler to examine the exceptions received on the message pump.
         private static Task ExceptionReceivedHandler(ExceptionReceivedEventArgs exceptionReceivedEventArgs)
         {
-            Console.WriteLine($"Message handler encountered an exception {exceptionReceivedEventArgs.Exception}.");
             var context = exceptionReceivedEventArgs.ExceptionReceivedContext;
-            Console.WriteLine("Exception context for troubleshooting:");
-            Console.WriteLine($"- Endpoint: {context.Endpoint}");
-            Console.WriteLine($"- Entity Path: {context.EntityPath}");
-            Console.WriteLine($"- Executing Action: {context.Action}");
+
+            Log.Debug("Achievements Exception: {@context}", context);
+
             return Task.CompletedTask;
         }
     }

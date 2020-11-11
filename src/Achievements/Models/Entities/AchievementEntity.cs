@@ -1,8 +1,9 @@
-﻿namespace Achievements.Responses
+﻿using Microsoft.Azure.Cosmos.Table;
+
+namespace Achievements.Models.Entities
 {
-    public class GetAchievementsResponse
+    public class AchievementEntity : TableEntity
     {
-        public string Name { get; set; }
         public string Category { get; set; }
         public string Description { get; set; }
         public bool IsSecret { get; set; }

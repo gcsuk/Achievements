@@ -6,7 +6,7 @@ const setupConnection = () => {
         .build();
 
     connection.on('Unlocked', (achievement) => {
-        document.querySelector(".description").innerHTML = achievement.name;
+        document.querySelector(".description").innerHTML = achievement.description;
         document.querySelector(".achievement").classList.remove("hide");
 
         setTimeout(function() {

@@ -1,7 +1,6 @@
 ﻿using System.Threading.Tasks;
 using Achievements.Events;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
 
 namespace Achievements.Demo
 {
@@ -23,7 +22,7 @@ namespace Achievements.Demo
             var achievement = new AchievementUnlockedEvent
             {
                 UserId = "1",
-                AchievementId = 1
+                Achievement = "Learner"
             };
             
             await _eventSender.Send(achievement);

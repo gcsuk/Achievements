@@ -3,6 +3,6 @@
     public interface IAchievementEvent
     {
         string UserId { get; set; }
-        int AchievementId { get; set; }
+        string Achievement { get; set; }
     }
 }
